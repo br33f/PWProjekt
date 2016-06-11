@@ -1,5 +1,6 @@
 package states;
 
+import app.World;
 import gfx.DrawPanel;
 import gui.Configurator;
 import entitites.*;
@@ -15,18 +16,16 @@ import java.awt.event.ActionListener;
 public class MainState extends State {
     //attributes
     private int width, height;
-    private Configurator cfg;
     private DrawPanel drawPanel;
-    private Entity entity;
     private Timer mainTimer;
+    public World world;
 
     //methods
     public MainState(){
         this.width = 800;
         this.height = 800;
-        this.cfg = Configurator.getInstance();
         this.drawPanel = new DrawPanel(this);
-        this.entity = new Entity(0, 0, 20, 30);
+        this.world = new World();
     }
 
     @Override
@@ -36,22 +35,12 @@ public class MainState extends State {
         //timer
          mainTimer = new Timer(100, new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                tick();
+                world.tick();
                 drawPanel.repaint();
-                System.out.println("timer inside");
+                //System.out.println("timer inside");
             }
         });
         mainTimer.start();
-    }
-
-    public void render(Graphics g){
-        this.entity.render(g);
-        System.out.println("render inside");
-    }
-
-    public void tick(){
-        this.entity.tick();
-        System.out.println("tick inside");
     }
 
     public void initDisp() {

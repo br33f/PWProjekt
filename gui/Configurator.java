@@ -35,9 +35,8 @@ public class Configurator {
 
     public static Configurator getInstance(){
         if(Configurator.obj == null)
-            return new Configurator();
-        else
-            return Configurator.obj;
+            Configurator.obj = new Configurator();
+        return Configurator.obj;
     }
 
     public JPanel getConfigPanel() {
@@ -46,12 +45,12 @@ public class Configurator {
 
     private void butClicked(){
         this.cars = (Integer.parseInt(this.carsInput.getText()) > 0) ? Integer.parseInt(this.carsInput.getText()) : 3;
-
+        if(this.cars > 6) this.cars = 6;
         State.setState(new MainState());
         State.launch();
     }
 
     public int getCars() {
-        return cars;
+        return this.cars;
     }
 }
