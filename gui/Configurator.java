@@ -45,7 +45,7 @@ public class Configurator {
 
     private void butClicked(){
         this.cars = (Integer.parseInt(this.carsInput.getText()) > 0) ? Integer.parseInt(this.carsInput.getText()) : 3;
-        if(this.cars > 6) this.cars = 6;
+        if(this.cars > 8) this.cars = 8;
         State.setState(new MainState());
         State.launch();
     }

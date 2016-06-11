@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Random;
 
 /**
  * Created by br33 on 11.06.2016.
@@ -14,9 +15,12 @@ public class Car extends Entity implements Runnable {
     //attributes
     private Timer carTimer;
     private int age, counter;
-    private int etap;
+    public int etap;
     private World world;
     private ParkingSlot miejsceParkingowe;
+    private ParkingWait miejsceCzekajace;
+    private int nr;
+    private int speed = 1;
 
     //methods
     public Car(int x, int y, int width, int height, World world) {
@@ -25,20 +29,13 @@ public class Car extends Entity implements Runnable {
         this.miejsceParkingowe = null;
         this.world = world;
 
-        carTimer = new Timer(50, new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                tick();
-                counter++;
-                if(counter > 200){
-                    counter = 0;
-                    age++;
-                }
-            }
-        });
-        carTimer.start();
-
-        this.age = this.counter = 0;
+        this.counter = 0;
+        this.age = -100;
         this.etap = 0;
+        this.nr = this.world.createdCars;
+
+        Random generator = new Random();
+        this.speed += generator.nextInt(3);
     }
 
     @Override
@@ -47,30 +44,55 @@ public class Car extends Entity implements Runnable {
         g.drawRect(x, y, width, height);
         g.setColor(Color.RED);
         g.fill3DRect(x, y, width, height, true);
+
+        g.setColor(Color.white);
+        g.drawString(Integer.toString(this.etap), x + 20, y + 20);
+
     }
 
     @Override
     public void tick() {
         switch(etap){
             case 0:
+                //znajdz wait parking
+                this.searchWait();
+                if(miejsceCzekajace != null) {
+                    this.goParkingWait();
+                    if(miejsceCzekajace.isBest() && this.y <= miejsceCzekajace.y + 10) {
+                        etap++;
+                    }
+                }
+                break;
+            case 1:
                 //szukaj miejsca do parkowania
                 this.searchSpot();
                 break;
-            case 1:
+            case 2:
                 //jazda na miejsce
                 this.goParkingSlot();
                 break;
-            case 2:
+            case 3:
                 //szukaj naprawy
                 this.searchRepair();
                 break;
-            case 3:
+            case 4:
                 //jedz na stanowisko
                 this.goStation1();
                 break;
-            case 4:
+            case 5:
                 //dojazd na stanowisko przez drzwi
+                if(this.world.checkout.getObslugiwany() != null)
+                    if(this.world.checkout.getObslugiwany().y < 340)
+                        break;
                 this.goStation2();
+                break;
+            case 6:
+                //dojazd do kasy
+                this.goCheckout();
+                break;
+            case 7:
+                //wyjazd
+                this.goOut();
                 break;
         }
     }
@@ -81,12 +103,38 @@ public class Car extends Entity implements Runnable {
         this.height = px;
     }
 
+    private void searchWait(){
+        for(ParkingWait pw : this.world.parkingWaits){
+            if(pw.isEmpty()){
+                if(miejsceCzekajace != null) {
+                    if (miejsceCzekajace.y > pw.y) {
+                        if(pw.zajmijMiejsce(this)) {
+                            miejsceCzekajace.zwolnij();
+                            miejsceCzekajace = pw;
+                        }
+                    }
+                }
+                else {
+                    if(pw.zajmijMiejsce(this))
+                        miejsceCzekajace = pw;
+                }
+                break;
+            }
+        }
+    }
+    private void goParkingWait(){
+        if(this.y > this.miejsceCzekajace.y + 10)
+            this.y -= 3;
+    }
+
     private void searchSpot(){
         for(ParkingSlot ps : this.world.parkingSlots){
             if(ps.isEmpty())
                 if(ps.zaparkuj(this)) {
                     miejsceParkingowe = ps;
                     etap++;
+                    miejsceCzekajace.zwolnij();
+                    miejsceCzekajace = null;
                     break;
                 }
         }
@@ -105,6 +153,7 @@ public class Car extends Entity implements Runnable {
             this.x -= 3;
         }
         else{
+            this.age = 0;
             etap++;
         }
     }
@@ -113,7 +162,7 @@ public class Car extends Entity implements Runnable {
         boolean mojaKolej = true;
         for(Car c : this.world.cars){
             if(c != null) {
-                if (c.age > this.age) {
+                if (c.age > this.age && c.etap == 2) {
                     mojaKolej = false;
                     break;
                 }
@@ -131,7 +180,7 @@ public class Car extends Entity implements Runnable {
     private void goStation1(){
         Station s = this.world.station;
         if(this.x > s.x + 200)
-            this.x -= 3;
+            this.x -= this.speed;
         else if(this.width > this.height)
             this.swap();
         else if(this.y + this.width/2 < s.y + s.height/2)
@@ -145,14 +194,49 @@ public class Car extends Entity implements Runnable {
     }
 
     private void goStation2(){
-        if(this.x > this.world.station.x + 30)
-            this.x -= 3;
-        else
-            etap++;
+        if(this.x > this.world.station.x + 15)
+            this.x -= this.speed;
+    }
+
+    private void goCheckout(){
+        if(this.x < 255)
+            this.x += this.speed;
+        else if(this.width > this.height)
+            this.swap();
+        else if(this.y < 386)
+            this.y += this.speed;
+    }
+
+    private void goOut(){
+        if(this.height > this.width && this.x < 450)
+            this.swap();
+        else if(this.x < 450)
+            this.x += this.speed;
+        else if(this.height < this.width)
+            this.swap();
+        else if(this.y < 801)
+            this.y += this.speed;
+        else{
+            if(this.world.createdCars == this.world.cfg.getCars()) {
+                this.etap = 0;
+                this.x = 700;
+                this.y = 800;
+            }
+        }
     }
 
     @Override
     public void run() {
-        System.out.println("witam");
+        carTimer = new Timer(30, new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                tick();
+                counter++;
+                if(counter > 25){
+                    counter = 0;
+                    age++;
+                }
+            }
+        });
+        carTimer.start();
     }
 }

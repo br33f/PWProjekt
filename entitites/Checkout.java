@@ -5,21 +5,19 @@ import java.awt.*;
 /**
  * Created by br33 on 11.06.2016.
  */
-public class Station extends Entity {
+public class Checkout extends Entity {
     //attributes
-    private Car naprawiany;
+    private Car obslugiwany;
 
     //methods
-    public Station(int x, int y, int width, int height) {
+    public Checkout(int x, int y, int width, int height) {
         super(x, y, width, height);
 
-        this.naprawiany = null;
+        this.obslugiwany = null;
     }
 
     @Override
     public void render(Graphics g) {
-        g.setColor(Color.white);
-        g.fillRect(x, y, width, height);
         g.setColor(Color.BLACK);
         g.drawRect(x, y, width, height);
     }
@@ -30,23 +28,24 @@ public class Station extends Entity {
     }
 
     public synchronized boolean isEmpty(){
-        return (this.naprawiany == null);
+        return (this.obslugiwany == null);
     }
 
-    public synchronized boolean napraw(Car car){
-        if(this.isEmpty()){
-            this.naprawiany = car;
+    public synchronized boolean zaplac(Car car){
+        if(isEmpty()){
+            this.obslugiwany = car;
             return true;
         }
         else
             return false;
     }
 
-    public synchronized Car getNaprawiany(){
-        return this.naprawiany;
+    public synchronized Car getObslugiwany(){
+        return this.obslugiwany;
     }
 
     public synchronized void zwolnij(){
-        this.naprawiany = null;
+        this.obslugiwany.etap++;
+        this.obslugiwany = null;
     }
 }
