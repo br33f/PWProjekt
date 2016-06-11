@@ -2,10 +2,14 @@ package entitites;
 
 import app.World;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.Random;
 
 /**
@@ -17,7 +21,8 @@ public class Worker extends Entity implements Runnable{
     private int naprawaCzas = 50;
     private Car naprawiany;
     private World world;
-
+    private BufferedImage image;
+    private int imgStatus=1;
     //methods
     public Worker(int x, int y, int width, int height, World world) {
         super(x, y, width, height);
@@ -29,8 +34,19 @@ public class Worker extends Entity implements Runnable{
 
     @Override
     public void render(Graphics g) {
-        g.setColor(Color.MAGENTA);
-        g.fillRect(x, y, width, height);
+//        g.setColor(Color.MAGENTA);
+//        g.fillRect(x, y, width, height);
+        try
+        {
+            if(imgStatus==1) image = ImageIO.read(new File("Worker1.png"));
+            else if(imgStatus==2) image = ImageIO.read(new File("Worker2.png"));
+        }
+        catch (IOException ex)
+        {
+            System.out.println("Brak ikonki");
+            System.exit(1);
+        }
+        g.drawImage(image,x,y,null);
     }
 
     @Override
@@ -42,11 +58,13 @@ public class Worker extends Entity implements Runnable{
                 break;
             case 1:
                 //idz do stacji
+                imgStatus=1;
                 this.goStation();
                 break;
             case 2:
                 //idz do kasy
                 this.goCheckout();
+                imgStatus=2;
                 break;
         }
     }

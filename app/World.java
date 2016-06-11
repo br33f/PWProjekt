@@ -2,6 +2,7 @@ package app;
 
 import entitites.*;
 import gui.Configurator;
+import sun.swing.BakedArrayList;
 
 import java.awt.*;
 import java.util.Random;
@@ -24,10 +25,22 @@ public class World {
     public Building building;
     public Worker worker;
     public Checkout checkout;
+    public Environment environment;
+    public Background background;
+    public Parking parking;
 
     //methods
     public World(){
         this.cfg = Configurator.getInstance();
+
+        //create parking graphics
+        this.parking=new Parking(550,50);
+
+        //create Background
+        this.background=new Background(0,0);
+
+        //create Environment graphics
+        this.environment=new Environment(656,0);
 
         //create parking waits
         this.parkingWaits = new ParkingWait[3];
@@ -62,6 +75,7 @@ public class World {
         new Thread(this.cars[createdCars]).start();
         this.createdCars++;
 
+
     }
 
     public void render(Graphics g){
@@ -72,11 +86,13 @@ public class World {
         for(ParkingWait slot : this.parkingWaits) {
             slot.render(g);
         }
-
+        this.background.render(g);
+        this.parking.render(g);
+        this.parking.renderStop(g);
         this.station.render(g);
         this.building.render(g);
         this.checkout.render(g);
-
+        this.environment.render(g);
         this.worker.render(g);
 
         for(Car car : this.cars) {

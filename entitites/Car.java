@@ -2,10 +2,14 @@ package entitites;
 
 import app.World;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.Random;
 
 /**
@@ -21,6 +25,8 @@ public class Car extends Entity implements Runnable {
     private ParkingWait miejsceCzekajace;
     private int nr;
     private int speed = 1;
+    private BufferedImage image;
+    private int imageC=1;
 
     //methods
     public Car(int x, int y, int width, int height, World world) {
@@ -40,13 +46,27 @@ public class Car extends Entity implements Runnable {
 
     @Override
     public void render(Graphics g) {
-        g.setColor(Color.BLACK);
-        g.drawRect(x, y, width, height);
-        g.setColor(Color.RED);
-        g.fill3DRect(x, y, width, height, true);
+//        g.setColor(Color.BLACK);
+//        g.drawRect(x, y, width, height);
+//        g.setColor(Color.RED);
+//        g.fill3DRect(x, y, width, height, true);
 
-        g.setColor(Color.white);
+        g.setColor(Color.BLACK);
         g.drawString(Integer.toString(this.etap) + ":" + Integer.toString(this.age), x + 10, y + 20);
+        try
+        {
+            if(imageC==1) image = ImageIO.read(new File("Car1.png"));
+            else if(imageC==2) image = ImageIO.read(new File("Car2.png"));
+            else if(imageC==3) image = ImageIO.read(new File("Car3.png"));
+            else if(imageC==4) image = ImageIO.read(new File("Car4.png"));
+        }
+
+        catch (IOException ex)
+        {
+            System.out.println("Brak ikonki");
+            System.exit(1);
+        }
+        g.drawImage(image,x,y,null);
 
     }
 
@@ -55,6 +75,7 @@ public class Car extends Entity implements Runnable {
         switch(etap){
             case 0:
                 //znajdz wait parking
+                imageC=1;
                 this.searchWait();
                 if(miejsceCzekajace != null) {
                     this.goParkingWait();
@@ -65,18 +86,22 @@ public class Car extends Entity implements Runnable {
                 break;
             case 1:
                 //szukaj miejsca do parkowania
+                imageC=2;
                 this.searchSpot();
                 break;
             case 2:
                 //jazda na miejsce
+                imageC=2;
                 this.goParkingSlot();
                 break;
             case 3:
                 //szukaj naprawy
+                imageC=1;
                 this.searchRepair();
                 break;
             case 4:
                 //jedz na stanowisko
+                imageC=2;
                 this.goStation1();
                 break;
             case 5:
@@ -88,11 +113,13 @@ public class Car extends Entity implements Runnable {
                 break;
             case 6:
                 //dojazd do kasy
+                imageC=3;
                 this.goCheckout();
                 break;
             case 7:
                 //wyjazd
                 this.goOut();
+                imageC=4;
                 break;
         }
     }

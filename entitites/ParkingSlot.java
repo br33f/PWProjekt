@@ -1,6 +1,10 @@
 package entitites;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by br33 on 11.06.2016.
