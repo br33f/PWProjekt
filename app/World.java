@@ -14,6 +14,7 @@ public class World {
     public Configurator cfg;
     private Graphics g;
     public int createdCars = 0;
+    public int lastSpawn = 0;
     private int rTick = 50;
     private int counter = 0;
     public ParkingSlot[] parkingSlots;
@@ -86,6 +87,7 @@ public class World {
     }
 
     public void tick(){
+        lastSpawn++;
         counter++;
         if(counter > rTick){
             counter = 0;
@@ -97,10 +99,11 @@ public class World {
     }
 
     private void createCar(){
-        if(this.createdCars < this.cfg.getCars()) {
+        if(this.createdCars < this.cfg.getCars() && this.lastSpawn > 20) {
             this.cars[createdCars] = new Car(700, 750, 30, 50, this);
             new Thread(this.cars[createdCars]).start();
             this.createdCars++;
+            this.lastSpawn = 0;
         }
     }
 }

@@ -20,7 +20,7 @@ public class ParkingWait extends Entity {
     @Override
     public void render(Graphics g) {
         g.setColor(Color.black);
-        g.drawRect(this.x, this.y, this.width, this.height);
+        //g.drawRect(this.x, this.y, this.width, this.height);
     }
 
     @Override

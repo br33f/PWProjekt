@@ -19,7 +19,7 @@ public class App {
     //methods
     public App(){
         this.configState = new ConfigState();
-        this.frame = new JFrame("Projekt PW v0.2");
+        this.frame = new JFrame("Projekt PW v1.0");
         State.setFrame(this.frame);
     }
 

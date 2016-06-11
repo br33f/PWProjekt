@@ -30,7 +30,7 @@ public class Car extends Entity implements Runnable {
         this.world = world;
 
         this.counter = 0;
-        this.age = -100;
+        this.age = 0;
         this.etap = 0;
         this.nr = this.world.createdCars;
 
@@ -46,7 +46,7 @@ public class Car extends Entity implements Runnable {
         g.fill3DRect(x, y, width, height, true);
 
         g.setColor(Color.white);
-        g.drawString(Integer.toString(this.etap), x + 20, y + 20);
+        g.drawString(Integer.toString(this.etap) + ":" + Integer.toString(this.age), x + 10, y + 20);
 
     }
 
@@ -104,18 +104,34 @@ public class Car extends Entity implements Runnable {
     }
 
     private void searchWait(){
-        for(ParkingWait pw : this.world.parkingWaits){
-            if(pw.isEmpty()){
-                if(miejsceCzekajace != null) {
+        Car przedemna = null;
+        for(Car c : this.world.cars){
+            if(c != null) {
+                if (c.age > this.age && c.etap == 0) {
+                    przedemna = c;
+                    break;
+                }
+            }
+        }
+        for (ParkingWait pw : this.world.parkingWaits) {
+            if (pw.isEmpty()) {
+                //warunki pierszenstwa
+                if(przedemna != null) {
+                    if (przedemna.miejsceCzekajace == null)
+                        return;
+                    else if(przedemna.miejsceCzekajace.y > pw.y)
+                        return;
+                }
+
+                if (miejsceCzekajace != null) {
                     if (miejsceCzekajace.y > pw.y) {
-                        if(pw.zajmijMiejsce(this)) {
+                        if (pw.zajmijMiejsce(this)) {
                             miejsceCzekajace.zwolnij();
                             miejsceCzekajace = pw;
                         }
                     }
-                }
-                else {
-                    if(pw.zajmijMiejsce(this))
+                } else {
+                    if (pw.zajmijMiejsce(this))
                         miejsceCzekajace = pw;
                 }
                 break;
@@ -162,7 +178,7 @@ public class Car extends Entity implements Runnable {
         boolean mojaKolej = true;
         for(Car c : this.world.cars){
             if(c != null) {
-                if (c.age > this.age && c.etap == 2) {
+                if (c.age > this.age && c.etap == 3) {
                     mojaKolej = false;
                     break;
                 }
@@ -217,10 +233,12 @@ public class Car extends Entity implements Runnable {
         else if(this.y < 801)
             this.y += this.speed;
         else{
-            if(this.world.createdCars == this.world.cfg.getCars()) {
+            if(this.world.lastSpawn > 20) {
                 this.etap = 0;
                 this.x = 700;
                 this.y = 800;
+                this.age = 0;
+                this.world.lastSpawn = 0;
             }
         }
     }

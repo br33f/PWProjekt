@@ -64,14 +64,19 @@ public class Worker extends Entity implements Runnable{
         else if(this.y > this.world.station.y + this.world.station.height / 2)
             this.y -= 2;
         else{
-            if(this.world.station.getNaprawiany().x <= this.world.station.x + 15 || this.naprawiany != null) {
-                if(this.naprawiany == null) {
-                    //jezeli nie zaczalem naprawiac zadnego
-                    this.naprawiany = this.world.station.getNaprawiany();
-                    this.world.station.zwolnij();
-                    this.world.checkout.zaplac(this.naprawiany);
+            if(this.world.station.getNaprawiany() != null || this.naprawiany != null)
+            {
+                if(this.naprawiany == null){
+                    if(this.world.station.getNaprawiany().x <= this.world.station.x + 15 ){
+                        this.naprawiany = this.world.station.getNaprawiany();
+                        this.world.station.zwolnij();
+                        this.world.checkout.zaplac(this.naprawiany);
+                    }
                 }
-                //jeżeli jest na pozycji naprawy
+            }
+
+            //jeżeli jest na pozycji naprawy
+            if(this.naprawiany != null) {
                 naprawaCzas--;
                 if (naprawaCzas <= 0) {
                     this.naprawiany.etap++;
