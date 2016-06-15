@@ -18,10 +18,13 @@ public class Station extends Entity {
 
     @Override
     public void render(Graphics g) {
-        g.setColor(Color.white);
-        g.fillRect(x, y, width, height);
-        g.setColor(Color.BLACK);
-        g.drawRect(x, y, width, height);
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setStroke(new BasicStroke(4));
+        g.setColor(Color.DARK_GRAY);
+        g.drawLine(x, y + 20, x + width, y + 20);
+        g.drawLine(x, y + height - 20, x + width, y + height - 20);
+        g.drawString("Podnosnik", x + 10, y + 10);
+        g2.setStroke(new BasicStroke(1));
     }
 
     @Override

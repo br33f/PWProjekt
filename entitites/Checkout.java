@@ -20,6 +20,7 @@ public class Checkout extends Entity {
     public void render(Graphics g) {
         g.setColor(Color.BLACK);
         g.drawRect(x, y, width, height);
+        g.drawString("KASA", x + 5, y + height + 15);
     }
 
     @Override

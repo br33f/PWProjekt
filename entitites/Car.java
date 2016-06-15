@@ -1,6 +1,7 @@
 package entitites;
 
 import app.World;
+import gfx.ImageLoader;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -8,8 +9,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.Random;
 
 /**
@@ -25,8 +24,9 @@ public class Car extends Entity implements Runnable {
     private ParkingWait miejsceCzekajace;
     private int nr;
     private int speed = 1;
-    private BufferedImage image;
+    private BufferedImage[] image;
     private int imageC=1;
+    private int side;
 
     //methods
     public Car(int x, int y, int width, int height, World world) {
@@ -35,6 +35,7 @@ public class Car extends Entity implements Runnable {
         this.miejsceParkingowe = null;
         this.world = world;
 
+        this.side = 0;
         this.counter = 0;
         this.age = 0;
         this.etap = 0;
@@ -42,31 +43,18 @@ public class Car extends Entity implements Runnable {
 
         Random generator = new Random();
         this.speed += generator.nextInt(3);
+
+        //ustaw ikony
+        image = new BufferedImage[4];
+        for(int i = 0; i < 4; i++)
+            image[i] = ImageLoader.loadImage("/Car" + (i + 1) + ".png");
     }
 
     @Override
     public void render(Graphics g) {
-//        g.setColor(Color.BLACK);
-//        g.drawRect(x, y, width, height);
-//        g.setColor(Color.RED);
-//        g.fill3DRect(x, y, width, height, true);
-
-        g.setColor(Color.BLACK);
-        g.drawString(Integer.toString(this.etap) + ":" + Integer.toString(this.age), x + 10, y + 20);
-        try
-        {
-            if(imageC==1) image = ImageIO.read(new File("Car1.png"));
-            else if(imageC==2) image = ImageIO.read(new File("Car2.png"));
-            else if(imageC==3) image = ImageIO.read(new File("Car3.png"));
-            else if(imageC==4) image = ImageIO.read(new File("Car4.png"));
-        }
-
-        catch (IOException ex)
-        {
-            System.out.println("Brak ikonki");
-            System.exit(1);
-        }
-        g.drawImage(image,x,y,null);
+        g.setColor(Color.WHITE);
+        g.drawImage(image[imageC - 1],x,y,null);
+        g.drawString(Integer.toString(this.age), x + 10, y + 20);
 
     }
 
@@ -123,6 +111,10 @@ public class Car extends Entity implements Runnable {
         }
     }
 
+    public void setSide(int side) {
+        this.side = side;
+    }
+
     private void swap(){
         int px = width;
         this.width = this.height;
@@ -130,15 +122,7 @@ public class Car extends Entity implements Runnable {
     }
 
     private void searchWait(){
-        Car przedemna = null;
-        for(Car c : this.world.cars){
-            if(c != null) {
-                if (c.age > this.age && c.etap == 0) {
-                    przedemna = c;
-                    break;
-                }
-            }
-        }
+        Car przedemna = this.carsAhead(0);
         for (ParkingWait pw : this.world.parkingWaits) {
             if (pw.isEmpty()) {
                 //warunki pierszenstwa
@@ -202,15 +186,8 @@ public class Car extends Entity implements Runnable {
     }
 
     private void searchRepair(){
-        boolean mojaKolej = true;
-        for(Car c : this.world.cars){
-            if(c != null) {
-                if (c.age > this.age && c.etap == 3) {
-                    mojaKolej = false;
-                    break;
-                }
-            }
-        }
+        Car przedemna = this.carsAhead(3);
+        boolean mojaKolej = (przedemna == null) ? true : false;
         if(mojaKolej){
             if(this.world.station.isEmpty())
                 if(this.world.station.napraw(this)){
@@ -222,7 +199,7 @@ public class Car extends Entity implements Runnable {
 
     private void goStation1(){
         Station s = this.world.station;
-        if(this.x > s.x + 200)
+        if(this.x > s.x + 230)
             this.x -= this.speed;
         else if(this.width > this.height) {
             imageC=3;
@@ -268,7 +245,7 @@ public class Car extends Entity implements Runnable {
             this.swap();
         }
 
-        else if(this.x < 450)
+        else if(this.x < 450 + (side * 50))
             this.x += this.speed;
         else if(this.height < this.width){
             this.swap();
@@ -280,7 +257,7 @@ public class Car extends Entity implements Runnable {
         else{
             if(this.world.lastSpawn > 20) {
                 this.etap = 0;
-                this.x = 700;
+                this.x = 720;
                 this.y = 800;
                 this.age = 0;
                 this.world.lastSpawn = 0;
@@ -288,9 +265,22 @@ public class Car extends Entity implements Runnable {
         }
     }
 
+    private Car carsAhead(int etap){
+        Car przedemna = null;
+        for(Car c : this.world.cars){
+            if(c != null) {
+                if (c.age > this.age && c.etap == etap) {
+                    przedemna = c;
+                    break;
+                }
+            }
+        }
+        return przedemna;
+    }
+
     @Override
     public void run() {
-        carTimer = new Timer(5, new ActionListener() {
+        carTimer = new Timer(30, new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 tick();
                 counter++;

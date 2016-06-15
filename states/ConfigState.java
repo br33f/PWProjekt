@@ -15,7 +15,7 @@ public class ConfigState extends State {
     public ConfigState(){
         this.configurator = Configurator.getInstance();
         this.width = 600;
-        this.height = 300;
+        this.height = 150;
     }
 
     public void run(){

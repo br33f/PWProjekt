@@ -1,6 +1,7 @@
 package entitites;
 
 import app.World;
+import gfx.ImageLoader;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -21,8 +22,12 @@ public class Worker extends Entity implements Runnable{
     private int naprawaCzas = 50;
     private Car naprawiany;
     private World world;
-    private BufferedImage image;
+    private BufferedImage[] image;
     private int imgStatus=1;
+    private int side;
+    private int foot;
+
+
     //methods
     public Worker(int x, int y, int width, int height, World world) {
         super(x, y, width, height);
@@ -30,23 +35,19 @@ public class Worker extends Entity implements Runnable{
         this.status = 0;
         this.world = world;
         this.naprawiany = null;
+        this.side = 0;
+        this.foot = 0;
+
+        //ustaw ikony
+        image = new BufferedImage[4];
+        for(int i = 0; i < 4; i++)
+            image[i] = ImageLoader.loadImage("/Worker" + (i + 1) + ".png");
     }
 
     @Override
     public void render(Graphics g) {
-//        g.setColor(Color.MAGENTA);
-//        g.fillRect(x, y, width, height);
-        try
-        {
-            if(imgStatus==1) image = ImageIO.read(new File("Worker2.png"));
-            else if(imgStatus==2) image = ImageIO.read(new File("Worker1.png"));
-        }
-        catch (IOException ex)
-        {
-            System.out.println("Brak ikonki");
-            System.exit(1);
-        }
-        g.drawImage(image,x,y,null);
+        int f = (foot > 5) ? 2 : 0;
+        g.drawImage(image[imgStatus - 1 + f],x,y,width+10, height+10, null);
     }
 
     @Override
@@ -58,13 +59,13 @@ public class Worker extends Entity implements Runnable{
                 break;
             case 1:
                 //idz do stacji
-                imgStatus=1;
+                imgStatus=2;
                 this.goStation();
                 break;
             case 2:
                 //idz do kasy
                 this.goCheckout();
-                imgStatus=2;
+                imgStatus=1;
                 break;
         }
     }
@@ -77,10 +78,14 @@ public class Worker extends Entity implements Runnable{
     }
 
     private void goStation(){
-        if(this.x > this.world.building.x + 10)
+        if(this.x > this.world.building.x + 10) {
             this.x -= 2;
-        else if(this.y > this.world.station.y + this.world.station.height / 2)
+            this.foot = (this.foot + 1) % 10;
+        }
+        else if(this.y > this.world.station.y + this.world.station.height / 2) {
             this.y -= 2;
+            this.foot = (this.foot + 1) % 10;
+        }
         else{
             if(this.world.station.getNaprawiany() != null || this.naprawiany != null)
             {
@@ -110,14 +115,22 @@ public class Worker extends Entity implements Runnable{
     }
 
     private void goCheckout(){
-        if(this.x > this.world.building.x + 10 && this.y < 420)
+        if(this.x > this.world.building.x + 10 && this.y < 420) {
+            this.foot = (this.foot + 1) % 10;
             this.x -= 2;
-        else if(this.y < 420)
+        }
+        else if(this.y < 420) {
+            this.foot = (this.foot + 1) % 10;
             this.y += 2;
-        else if(this.x < 200)
+        }
+        else if(this.x < 200){
+            this.foot = (this.foot + 1) % 10;
             this.x += 2;
+        }
         else if(this.world.checkout.getObslugiwany().y >= 386){
             status = 0;
+            this.world.checkout.getObslugiwany().setSide(side);
+            side = (side + 1) % 2;
             this.world.checkout.zwolnij();
         }
     }

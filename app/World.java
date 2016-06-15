@@ -26,7 +26,6 @@ public class World {
     public Worker worker;
     public Checkout checkout;
     public Environment environment;
-    public Background background;
     public Parking parking;
 
     //methods
@@ -34,10 +33,7 @@ public class World {
         this.cfg = Configurator.getInstance();
 
         //create parking graphics
-        this.parking=new Parking(550,50);
-
-        //create Background
-        this.background=new Background(0,0);
+        this.parking=new Parking(525,230);
 
         //create Environment graphics
         this.environment=new Environment(656,0);
@@ -71,7 +67,7 @@ public class World {
         this.cars = new Car[this.cfg.getCars()];
 
         //first car
-        this.cars[createdCars] = new Car(700, 750, 30, 50, this);
+        this.cars[createdCars] = new Car(720, 750, 30, 50, this);
         new Thread(this.cars[createdCars]).start();
         this.createdCars++;
 
@@ -79,6 +75,7 @@ public class World {
     }
 
     public void render(Graphics g){
+        this.environment.render(g);
         for(ParkingSlot slot : this.parkingSlots) {
             slot.render(g);
         }
@@ -86,13 +83,11 @@ public class World {
         for(ParkingWait slot : this.parkingWaits) {
             slot.render(g);
         }
-        this.background.render(g);
         this.parking.render(g);
        // this.parking.renderStop(g);
-        this.station.render(g);
         this.building.render(g);
+        this.station.render(g);
         this.checkout.render(g);
-        this.environment.render(g);
         this.worker.render(g);
 
         for(Car car : this.cars) {
@@ -116,7 +111,7 @@ public class World {
 
     private void createCar(){
         if(this.createdCars < this.cfg.getCars() && this.lastSpawn > 20) {
-            this.cars[createdCars] = new Car(700, 750, 30, 50, this);
+            this.cars[createdCars] = new Car(720, 750, 30, 50, this);
             new Thread(this.cars[createdCars]).start();
             this.createdCars++;
             this.lastSpawn = 0;

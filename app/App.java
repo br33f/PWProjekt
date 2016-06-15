@@ -1,5 +1,6 @@
 package app;
 
+import gfx.ImageLoader;
 import gui.Configurator;
 import states.*;
 
@@ -26,16 +27,9 @@ public class App {
         this.configState = new ConfigState();
         this.frame = new JFrame("Projekt PW v1.0");
         State.setFrame(this.frame);
-        ImageIcon icon = new ImageIcon("ikona.png");
-        this.frame.setIconImage(icon.getImage());
-       /* try {
-            img = ImageIO.read(new File("tlo.png"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Image background=img.getScaledInstance(800,800,Image.SCALE_SMOOTH);
-        ImageIcon imageIcon=new ImageIcon(background);
-        this.frame.setContentPane(new JLabel("tlo.png"));*/
+        BufferedImage img = ImageLoader.loadImage("/Ikona.png");
+        ImageIcon icon = new ImageIcon(img);
+                this.frame.setIconImage(icon.getImage());
     }
 
     private void launch(){

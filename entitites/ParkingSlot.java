@@ -22,10 +22,14 @@ public class ParkingSlot extends Entity {
 
     @Override
     public void render(Graphics g) {
-        g.setColor(Color.BLACK);
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setStroke(new BasicStroke(3));
+        g.setColor(Color.WHITE);
 
         g.drawLine(this.x, this.y, this.x + this.width, this.y);
         g.drawLine(this.x, this.y + this.height, this.x + this.width, this.y + this.height);
+
+        g2.setStroke(new BasicStroke(1));
     }
 
     @Override

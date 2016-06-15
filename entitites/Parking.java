@@ -1,5 +1,7 @@
 package entitites;
 
+import gfx.ImageLoader;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -16,32 +18,12 @@ public class Parking extends Entity {
     //methods
     public Parking(int x, int y) {
         super(x, y);
+        image = ImageLoader.loadImage("/Parking.png");
     }
 
     @Override
     public void render(Graphics g) {
-        try
-        {
-            image = ImageIO.read(new File("Parking.png"));
-        }
-        catch (IOException ex)
-        {
-            System.out.println("Brak ikonki parking");
-            System.exit(1);
-        }
         g.drawImage(image,x,y,null);
-    }
-    public void renderStop(Graphics g) {
-        try
-        {
-            image = ImageIO.read(new File("Stop.png"));
-        }
-        catch (IOException ex)
-        {
-            System.out.println("Brak ikonki parking");
-            System.exit(1);
-        }
-        g.drawImage(image,300,170,null);
     }
     @Override
     public void tick() {
