@@ -86,22 +86,22 @@ public class Car extends Entity implements Runnable {
                 break;
             case 1:
                 //szukaj miejsca do parkowania
-                imageC=2;
+                imageC=1;
                 this.searchSpot();
                 break;
             case 2:
                 //jazda na miejsce
-                imageC=2;
+                //imageC=1;
                 this.goParkingSlot();
                 break;
             case 3:
                 //szukaj naprawy
-                imageC=1;
+                imageC=2;
                 this.searchRepair();
                 break;
             case 4:
                 //jedz na stanowisko
-                imageC=2;
+               // imageC=2;
                 this.goStation1();
                 break;
             case 5:
@@ -113,13 +113,12 @@ public class Car extends Entity implements Runnable {
                 break;
             case 6:
                 //dojazd do kasy
-                imageC=3;
+
                 this.goCheckout();
                 break;
             case 7:
                 //wyjazd
                 this.goOut();
-                imageC=4;
                 break;
         }
     }
@@ -190,6 +189,7 @@ public class Car extends Entity implements Runnable {
         }
         else if(this.width < this.height){
             //dojechalem na wysokosc - obracam
+            imageC=2;
             this.swap();
         }
         else if(this.x > this.miejsceParkingowe.x + 6){
@@ -224,13 +224,16 @@ public class Car extends Entity implements Runnable {
         Station s = this.world.station;
         if(this.x > s.x + 200)
             this.x -= this.speed;
-        else if(this.width > this.height)
+        else if(this.width > this.height) {
+            imageC=3;
             this.swap();
+        }
         else if(this.y + this.width/2 < s.y + s.height/2)
             this.y++;
         else if(this.y + this.width/2 > s.y + s.height/2)
             this.y--;
         else if(this.width < this.height) {
+            imageC=2;
             this.swap();
             etap++;
         }
@@ -243,20 +246,35 @@ public class Car extends Entity implements Runnable {
 
     private void goCheckout(){
         if(this.x < 255)
+        {
+            imageC=4;
             this.x += this.speed;
+        }
+
         else if(this.width > this.height)
+        {
+
             this.swap();
+            imageC=3;
+        }
+
         else if(this.y < 386)
             this.y += this.speed;
     }
 
     private void goOut(){
-        if(this.height > this.width && this.x < 450)
+        if(this.height > this.width && this.x < 450){
+            imageC=4;
             this.swap();
+        }
+
         else if(this.x < 450)
             this.x += this.speed;
-        else if(this.height < this.width)
+        else if(this.height < this.width){
             this.swap();
+            imageC=3;
+        }
+
         else if(this.y < 801)
             this.y += this.speed;
         else{
@@ -272,7 +290,7 @@ public class Car extends Entity implements Runnable {
 
     @Override
     public void run() {
-        carTimer = new Timer(30, new ActionListener() {
+        carTimer = new Timer(5, new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 tick();
                 counter++;

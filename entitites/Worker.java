@@ -38,8 +38,8 @@ public class Worker extends Entity implements Runnable{
 //        g.fillRect(x, y, width, height);
         try
         {
-            if(imgStatus==1) image = ImageIO.read(new File("Worker1.png"));
-            else if(imgStatus==2) image = ImageIO.read(new File("Worker2.png"));
+            if(imgStatus==1) image = ImageIO.read(new File("Worker2.png"));
+            else if(imgStatus==2) image = ImageIO.read(new File("Worker1.png"));
         }
         catch (IOException ex)
         {

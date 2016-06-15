@@ -88,7 +88,7 @@ public class World {
         }
         this.background.render(g);
         this.parking.render(g);
-        this.parking.renderStop(g);
+       // this.parking.renderStop(g);
         this.station.render(g);
         this.building.render(g);
         this.checkout.render(g);
