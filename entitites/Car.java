@@ -16,13 +16,12 @@ import java.util.Random;
  */
 public class Car extends Entity implements Runnable {
     //attributes
-    private Timer carTimer;
     private int age, counter;
     public int etap;
     private World world;
     private ParkingSlot miejsceParkingowe;
     private ParkingWait miejsceCzekajace;
-    private int nr;
+    private boolean ustawilem;
     private int speed = 1;
     private BufferedImage[] image;
     private int imageC=1;
@@ -39,7 +38,7 @@ public class Car extends Entity implements Runnable {
         this.counter = 0;
         this.age = 0;
         this.etap = 0;
-        this.nr = this.world.createdCars;
+        this.ustawilem = false;
 
         Random generator = new Random();
         this.speed += generator.nextInt(3);
@@ -94,14 +93,10 @@ public class Car extends Entity implements Runnable {
                 break;
             case 5:
                 //dojazd na stanowisko przez drzwi
-                if(this.world.checkout.getObslugiwany() != null)
-                    if(this.world.checkout.getObslugiwany().y < 340)
-                        break;
                 this.goStation2();
                 break;
             case 6:
                 //dojazd do kasy
-
                 this.goCheckout();
                 break;
             case 7:
@@ -212,6 +207,12 @@ public class Car extends Entity implements Runnable {
         else if(this.width < this.height) {
             imageC=2;
             this.swap();
+            try {
+                this.world.building.getSemaphore().acquire();
+                ustawilem  = false;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             etap++;
         }
     }
@@ -222,19 +223,19 @@ public class Car extends Entity implements Runnable {
     }
 
     private void goCheckout(){
-        if(this.x < 255)
-        {
+        if(this.x < 255) {
             imageC=4;
             this.x += this.speed;
         }
-
-        else if(this.width > this.height)
-        {
+        else if(this.width > this.height) {
 
             this.swap();
             imageC=3;
         }
-
+        else if(this.y > 280 && !ustawilem) {
+            this.world.building.getSemaphore().release();
+            ustawilem = true;
+        }
         else if(this.y < 386)
             this.y += this.speed;
     }
@@ -244,14 +245,12 @@ public class Car extends Entity implements Runnable {
             imageC=4;
             this.swap();
         }
-
         else if(this.x < 450 + (side * 50))
             this.x += this.speed;
         else if(this.height < this.width){
             this.swap();
             imageC=3;
         }
-
         else if(this.y < 801)
             this.y += this.speed;
         else{
@@ -280,16 +279,19 @@ public class Car extends Entity implements Runnable {
 
     @Override
     public void run() {
-        carTimer = new Timer(30, new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                tick();
-                counter++;
-                if(counter > 25){
-                    counter = 0;
-                    age++;
-                }
+        int fps = 30;
+        while(true){
+            tick();
+            counter++;
+            if(counter > 25){
+                counter = 0;
+                age++;
             }
-        });
-        carTimer.start();
+            try {
+                Thread.sleep(1000/fps);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

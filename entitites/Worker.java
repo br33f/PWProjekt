@@ -137,11 +137,14 @@ public class Worker extends Entity implements Runnable{
 
     @Override
     public void run() {
-        Timer workerTimer = new Timer(30, new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                tick();
+        int fps = 30;
+        while(true){
+            tick();
+            try {
+                Thread.sleep(1000/fps);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        });
-        workerTimer.start();
+        }
     }
 }

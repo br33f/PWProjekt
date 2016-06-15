@@ -1,14 +1,20 @@
 package entitites;
 
 import java.awt.*;
+import java.util.concurrent.Semaphore;
 
 /**
  * Created by br33 on 11.06.2016.
  */
 public class Building extends Entity {
+    //attributes
+    private Semaphore s;
+
     //methods
     public Building() {
         super(50, 120, 0, 0);
+
+        this.s = new Semaphore(1);
     }
 
     @Override
@@ -35,5 +41,9 @@ public class Building extends Entity {
     @Override
     public void tick() {
 
+    }
+
+    public Semaphore getSemaphore(){
+        return s;
     }
 }
